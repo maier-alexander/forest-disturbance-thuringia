@@ -30,9 +30,15 @@
 - später mit GutHub zusätzlich "git push"
 - .gitignore (File-Endung) wird bei diesem Projekt von Nutzen sein, um mehrere GB große FE-Dateien nicht auf mein GitHub zu pushen
     - wirkt schon bei git add; wird also garnicht erst gestaged
+- Git speichert (staged) keine leeren Ordner
+
+**Projekthandhabung**
+- oft arbeitet man so, dass man in .ipynb ausprobiert und testet, und dann den funktionierenden Python Code in .py Dateien baut
+    - src = source code
 
 ### Entscheidungen
 - Mittels .gitignore werden die venv, große Rohdateien und den python cache nicht gestaged 
+- Ordnerstruktur angelegt: Daten -> roh/processed, notebooks, src, outputs
 
 ### Offene Fragen
 
