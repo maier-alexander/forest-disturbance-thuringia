@@ -8,7 +8,7 @@ The goal is to develop a reproducible Python workflow for detecting and analysin
 
 ## Research Question
 
-To be defined.
+Where have significant forest canopy changes occurred in a selected area of southern Thuringia between two comparable Sentinel-2 observation periods, and how do these changes spatially agree with the DLR Forest Canopy Cover Loss product?
 
 ## Study Area
 

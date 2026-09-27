@@ -1,6 +1,6 @@
 # Learning Log
 
-## 2026-09-27
+## 27.09.2026
 
 ### Was ich gemacht habe
 
@@ -40,5 +40,45 @@
 - Mittels .gitignore werden die venv, große Rohdateien und den python cache nicht gestaged 
 - Ordnerstruktur angelegt: Daten -> roh/processed, notebooks, src, outputs
 
+**Untersuchungsgebiet**
+Entscheidung:
+Süd-Thüringer Wald im Raum Steinach – Neuhaus am Rennweg – Sonneberg
+
+Warum:
+- Waldanteil hoch
+- Das Gebiet ist stark vom Borkenkäfer betroffen und besteht Überwiegend aus Kiefern-Monokulturen
+- --> starke Veränderung erwartbar
+- DLR-Vergleichsdaten verfügbar
+
+- Extent wird etwa bei 20 x 20 km bzw 25km x 25km liegen 
+
+**Vergleichszeitraum**
+Entscheidung:
+2018–2024
+
+Warum:
+- Beginn der starken Trocken-/Schadensperiode ab 2018
+- ausreichend langer Zeitraum für deutliche Veränderungen
+- DLR-Vergleich deckt ihn vollständig ab
+- Exakte Daten werden später, abhängig von Jahreszeit und Wolkenbedeckung, ausgewählt
+
+**Sentinel-2 Produkt**
+Entscheidung:
+Sentinel-2 Level-2A
+
+- Level-2A
+- B04
+- B08
+- B11
+- B12
+- SCL
+
+Warum:
+- ...
+- ...
+
+**zusätzliche Daten**
+- DLR Foreest Canopy Cover Loss (FCCL)
+- Waldmaske, vermutlich die auch vom DLR genutzt des Thünen-Instituts ((https://www.openagrar.de/receive/openagrar_mods_00084145))
 ### Offene Fragen
 
