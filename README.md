@@ -21,7 +21,6 @@ The area was selected for its extensive forest cover and visible forest canopy c
 ## Data
 
 | Dataset | Selection | Purpose |
-| --- | --- | --- |
 | Sentinel-2 Level-2A | 01 July 2018; tiles T32UPA and T32UPB | Reference observation |
 | Sentinel-2 Level-2A | 09 July 2024; tiles T32UPA and T32UPB | Comparison observation |
 | Thünen Institute, *Bestockte Holzbodenkarte 2018* | 2018 forest extent | Forest mask |

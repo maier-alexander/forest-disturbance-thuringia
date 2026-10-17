@@ -1,16 +1,10 @@
-# Große Rohdaten
 data/raw/
+data/processed
 
-# Virtuelle Python-Umgebung
 .venv/
 
-# Python-Cache
 __pycache__/
 *.pyc
 
-# Lokale VS-Code-Einstellungen
 .vscode/
-
-# Betriebssystemdateien
-.DS_Store
 Thumbs.db

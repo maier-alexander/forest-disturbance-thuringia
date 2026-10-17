@@ -100,6 +100,16 @@ Warum:
 - Datenauswahl und wichtige Entscheidungen dokumentiert
 
 ### Was ich gelernt habe
+- git diff --cached --stat
+    - git diff: zeigt Unterschiede zwischen Dateiversionen
+    - --cached: berücksichtigt nur Änderungen in der Staging Area
+    - --stat: zeigt nur eine kompakte Statistik statt der vollständigen Änderungen
+- git remote add [Name_für_Github_Acc] [link]; muss i.d.R. nur einmal eingestellt werden
+- git branch -M  [gewünschter_Branchname]
+    - git branch verwaltet lokale Branches
+    - M erzwingt die Umbenennung (Move/rename mit Force), auch wenn bereits ein Branch mit dem Zielnamen existiert
+- git push -u origin main
+    - "Pushe den lokalen Stand des Hauptbranches (main) auf mein GitHub (origin)"
 - Bedienung des Copernicus Browsers und das finden passender FE-Daten
 - Überprüfung der Tile-Anzahl 
 
@@ -144,3 +154,66 @@ Limitationen:
 - DLR-Produkt ist keine unabhängige Ground Truth
 - unterschiedliche Methoden und Zeiträume können zu Abweichungen führen
 - monatliche Verlustangaben erlauben keine taggenaue Zuordnung
+
+## 08.–12.10.2026
+
+### Was ich gemacht habe
+- Mit NumPy 2D-Raster indexiert, ausgeschnitten und elementweise verrechnet (u. a. NDVI)
+- Gültigkeits- und Vegetationsmasken erstellt; NoData-/NaN-Werte bei Berechnungen berücksichtigt
+- Überlappende Rasterkacheln per NumPy zu Mosaiken kombiniert und AOI-Ausschnitte erzeugt
+- Sentinel-2-Band B04 (10 m) mit Rasterio geöffnet, Metadaten und ein 100×100-Pixel-Fenster ausgelesen
+- Rasterausschnitt mit Matplotlib dargestellt – erst mit Pixelindizes, danach georeferenziert mit UTM-Koordinaten
+
+### Was ich gelernt habe
+**NumPy**
+- `ndarray` statt Python-Liste: gemeinsame Datentypen, mehrere Achsen und elementweise Rechenoperationen; `shape` = Form, `ndim` = Dimensionszahl, `size` = Elementanzahl, `dtype` = Datentyp
+- Indexierung/Slicing: `a[zeile, spalte]`, `a[start:stop, :]` (`stop` exklusiv)
+- Boolean Indexing: Bedingungen erzeugen Masken; `&` kombiniert, `~` invertiert; `a[maske]` liest und `a[maske] = wert` verändert gezielt Elemente
+- Fehlende Werte und Statistik: `np.isnan()`, `np.nanmean()`, `np.sum()` zum Zählen von `True`; `np.divide(..., out=..., where=...)` für Berechnungen nur an gültigen Positionen
+- Slicing erzeugt meist einen *View* (gemeinsame Daten); `.copy()` eine unabhängige Kopie
+- Rasterarrays kombinieren: `np.vstack()` untereinander, `np.hstack()` nebeneinander; bei echten Satellitendaten ist zusätzlich räumliche Ausrichtung nötig
+
+**Rasterio und Visualisierung**
+- `rasterio.open(pfad)` öffnet eine Rasterdatei (`.jp2`/`.tif`); `with` schließt sie automatisch
+- Metadaten: `width`/`height` (Pixel), `crs` (EPSG:32632), `res` (10 m), `count` (Bänder), `dtypes`, `bounds`
+- `src.read(1, window=Window(spalte, zeile, breite, höhe))` liest einen Ausschnitt direkt als NumPy-Array; spart Zeit und RAM
+- `src.xy(zeile, spalte)` liefert Pixelmittelpunkt als (Easting, Northing); Rasterzeilen steigen nach Süden
+- `src.transform` verbindet Pixelposition und Kartenkoordinaten; `src.window_transform(fenster)` berücksichtigt den verschobenen Ausschnitt
+- `plt.imshow()` zeigt ein Array mit Pixelachsen; `rasterio.plot.show(ausschnitt, transform=transform)` zeigt UTM-Koordinaten. `cmap` ändert nur die Darstellung, nicht die Pixelwerte
+
+## 13.–17.10.2026
+
+### Was ich gemacht habe
+- Sentinel-2-Vorverarbeitung fertiggestellt: zwei Tiles je Aufnahmedatum mosaikiert, Bänder auf gemeinsames 10-m-Raster ausgerichtet und SCL-Klassen 4/5/6 als gültig übernommen
+- Referenzgitter direkt aus der AOI erzeugt, sodass `preprocess.py` ohne bereits vorhandene Ergebnisdatei erneut durchlaufen kann; Rastergitter und Maskierung überprüft
+- BOA-Offset von −1000 und Quantifizierungswert von 10000 berücksichtigt; NDVI, NDMI und NBR für 2018 und 2024 berechnet
+- Pixelweise Differenzen (2024 − 2018) erstellt und nur gemeinsam gültige Pixel verglichen; unplausible Indexwerte außerhalb [−1, 1] ausgeschlossen
+- Veränderungen auf die Thünen-Waldflächen von 2018 beschränkt und mit dem DLR-FCCL-Produkt (zeitlich gefiltert) verglichen
+- ΔNDMI und ΔNBR anhand räumlich aufgeteilter Trainings- und Testdaten ausgewertet; binäre ΔNBR-Klassifikation und Vergleichskarten erstellt
+- Python-Skripte thematisch zusammengeführt und Verarbeitungsschritte übersichtlicher organisiert
+
+### Was ich gelernt habe
+**Rasterverarbeitung und NumPy**
+- `rasterio.merge.merge()` für Mosaike; `reproject()` mit `Resampling.nearest` für SCL-Klassen und `bilinear` für SWIR-Bänder
+- Gemeinsames Referenzgitter aus AOI-Grenzen, 10-m-Auflösung und `from_origin()` erstellen; keine Abhängigkeit von vorhandenen Ausgabedateien
+- `np.isin()` für SCL- und Klassenmasken, `np.isfinite()` für gültige Indexwerte, `np.ma.masked_invalid()` für Karten mit NoData
+- `src.profile.copy()` und `.update()` für GeoTIFF-Metadaten; `NaN` als NoData bei Indexrastern, `255` bei binären Klassifikationen
+- `Path.parent.mkdir(parents=True, exist_ok=True)` erstellt fehlende Ausgabeordner
+
+**Fernerkundung und Auswertung**
+- NDVI = (B08 − B04)/(B08 + B04), NDMI = (B08 − B11)/(B08 + B11), NBR = (B08 − B12)/(B08 + B12)
+- Bei Sentinel-2 L2A die BOA-Offsets vor Indexberechnungen berücksichtigen; `DN = 0` nicht als gültigen Reflexionswert behandeln
+- Ein negativer ΔIndex bedeutet Indexrückgang, aber nicht zwangsläufig Waldverlust; DLR ist ein Vergleichsprodukt, keine unabhängige Ground Truth
+- Perzentile und Schwellenwerte zur Untersuchung der Verteilungen; Precision, Recall und F1-Score für Klassifikationsvergleiche
+- Räumlich getrennte Trainings- und Testblöcke verringern die Verzerrung gegenüber einer zufälligen Pixelaufteilung, sind aber keine vollständig unabhängige externe Validierung
+- Matplotlib: `plt.subplots()`, `zip()`, `plotting_extent()`, `ListedColormap`, `Patch`, Legenden und `fig.savefig()` für georeferenzierte Vergleichskarten
+
+### Ergebnisse und Entscheidungen
+- Auf ursprünglichen Waldflächen mittlere Veränderungen: ΔNDVI −0,106; ΔNDMI −0,179; ΔNBR −0,171
+- DLR-Kronendachverlust im aufbereiteten Vergleichsdatensatz: 20.337,10 ha; einfache ΔNBR-Klassifikation: 22.196,07 ha (Flächen nicht ohne identische Gültigkeitsmaske direkt vergleichen)
+- Beste getestete ΔNBR-Schwelle: −0,125; Test-Precision 0,672, Recall 0,732, F1 0,700; ΔNDMI mit F1 0,680 etwas schwächer
+- Entscheidung: Für dieses Portfolio-Projekt zunächst beim interpretierbaren ΔNBR-Schwellenwertmodell bleiben, statt zusätzlich Machine Learning einzusetzen
+
+### Nächste Schritte
+- Finale Karten grafisch überarbeiten und räumliche Abweichungen zwischen eigener Klassifikation und DLR diskutieren
+- Methodische Grenzen, Ergebnisse und Reproduzierbarkeit im README dokumentieren; Git-Commit erstellen
