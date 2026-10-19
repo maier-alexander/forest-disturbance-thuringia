@@ -31,7 +31,7 @@ The analysis consists of six processing steps:
 
 3. **Change detection:** Changes were calculated as `Index_2024 - Index_2018`. Only pixels valid at both observation dates were included, and the analysis was restricted to forest areas identified by the 2018 Thünen forest mask.
 
-4. **DLR reference:** The DLR Forest Canopy Cover Loss dataset was aligned to the study grid. Detected losses from August 2018 to June 2024 were included. July 2024 was excluded because the monthly product does not distinguish losses occurring before or after the second Sentinel-2 acquisition on 9 July.
+4. **DLR reference:** The DLR Forest Canopy Cover Loss dataset was aligned to the study grid. Detected losses from August 2018 to June 2024 were included. July 2018 and July 2024 were excluded because the monthly product does not allow a precise comparison with the Sentinel-2 acquisition dates.
 
 5. **Classification and evaluation:** Thresholds for ΔNDMI and ΔNBR were selected by maximising the F1-score on spatially separated training blocks. Performance was assessed on held-out blocks using precision, recall and F1-score.
 
@@ -81,6 +81,12 @@ forest-disturbance-thuringia/
 ├── data/
 │   ├── raw/
 │   │   ├── sentinel2/
+│   │   │   ├── 2018/
+│   │   │   │   ├── T32UPA/
+│   │   │   │   └── T32UPB/
+│   │   │   └── 2024/
+│   │   │       ├── T32UPA/
+│   │   │       └── T32UPB/
 │   │   ├── study_area/
 │   │   └── reference/
 │   └── processed/
@@ -95,9 +101,23 @@ forest-disturbance-thuringia/
 │   └── maps/
 ├── main.py
 ├── requirements.txt
-├── learning_log.md
 └── README.md
 ```
+
+## Input Data
+
+Download the following Sentinel-2 Level-2A products from the [Copernicus Data Space Ecosystem](https://dataspace.copernicus.eu/):
+
+```text
+2018 / T32UPA: S2A_MSIL2A_20180701T102021_N0500_R065_T32UPA_20230811T042458.SAFE
+2018 / T32UPB: S2A_MSIL2A_20180701T102021_N0500_R065_T32UPB_20230811T042458.SAFE
+2024 / T32UPA: S2A_MSIL2A_20240709T102031_N0510_R065_T32UPA_20240709T142949.SAFE
+2024 / T32UPB: S2A_MSIL2A_20240709T102031_N0510_R065_T32UPB_20240709T142949.SAFE
+```
+
+Extract B04 and B08 (10 m) and B11, B12 and SCL (20 m) from each product into the matching `data/raw/sentinel2/<year>/<tile>/` folder. Keep the original `.jp2` filenames; the preprocessing script locates them recursively by tile, date, band and resolution.
+
+The workflow also requires `data/raw/study_area/study_area.shp` (with its accompanying shapefile components), `data/raw/reference/thuenen/holzbodenkarte_2018_32632.tif` and `data/raw/reference/dlr/FCCL_DE_P1M.tif`. The study-area shapefile is included in the repository; the large satellite and reference rasters must be obtained separately.
 
 ## Running the Project
 
@@ -121,9 +141,9 @@ Individual processing steps can also be executed separately, for example:
 python src/indices.py
 ```
 
-The workflow expects the original satellite and reference datasets in `data/raw/`. These files are not included in the repository due to their size. Intermediate GeoTIFFs are written to `data/processed/`, while the generated maps are saved in `outputs/maps/`.
+The workflow expects the satellite and reference rasters under `data/raw/`, as described in [Input Data](#input-data). The large raster files are not included in the repository due to their size. Intermediate GeoTIFFs are written to `data/processed/`, while the generated maps are saved in `outputs/maps/`.
 
-Reproducing the analysis requires obtaining the source datasets and placing the necessary files in the corresponding directories.
+To reproduce the analysis, download the listed products and place the extracted bands and reference rasters in the specified directories.
 
 ## Limitations
 
